@@ -2,7 +2,7 @@
 
 import requests
 import json
-import pprint
+import argparse
 
 api_url = 'http://api.gios.gov.pl/pjp-api/rest'
 
@@ -69,7 +69,23 @@ def printMeasurements(measurements):
             print(measurements[param][value], end='\t')
         print()
 
-measure = getLatestMeasurements(api_url, 987)
+'''
+Takes dictionary of station information and prints it nicely
+'''
+def printStationInfo(station):
+    print(station['city']['commune']['communeName'], end=", ")
+    print(station['addressStreet'], end="\n")
 
+parser = argparse.ArgumentParser(description="Get air quality information from GIOS")
+parser.add_argument("-s", "--station", action="store", dest="station", required=True)
+args = parser.parse_args()
+
+if not args.station:
+    parser.print_help()
+    exit(1)
+
+details = getStationDetails(api_url, args.station)
+measure = getLatestMeasurements(api_url, args.station)
+
+printStationInfo(details)
 printMeasurements(measure)
-
