@@ -60,6 +60,14 @@ def getLatestMeasurements(baseurl, station_id):
     return results
 
 '''
+Get general air quality index for a station
+'''
+def getCurrentIndex(baseurl, station_id):
+    url = baseurl + "/aqindex/getIndex/" + str(station_id)
+    result = json.loads(requests.get(url).text)
+    return result['stIndexLevel']['indexLevelName']
+
+'''
 Takes dictionary of measurement data and prints it nicely
 '''
 def printMeasurements(measurements):
@@ -76,6 +84,12 @@ def printStationInfo(station):
     print(station['city']['commune']['communeName'], end=", ")
     print(station['addressStreet'], end="\n")
 
+'''
+Nicely print general air quality index
+'''
+def printStationIndex(index):
+    print("Ogólny stan:", str(index), sep="\t", end="\n")
+
 parser = argparse.ArgumentParser(description="Get air quality information from GIOS")
 parser.add_argument("-s", "--station", action="store", dest="station", required=True)
 args = parser.parse_args()
@@ -84,8 +98,10 @@ if not args.station:
     parser.print_help()
     exit(1)
 
+index = getCurrentIndex(api_url, args.station)
 details = getStationDetails(api_url, args.station)
 measure = getLatestMeasurements(api_url, args.station)
 
 printStationInfo(details)
+printStationIndex(index)
 printMeasurements(measure)
