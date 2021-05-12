@@ -1,0 +1,7 @@
+lint-job:
+  tags:
+    - test
+    - shell
+  stage: test
+  script:
+    - pylint get-aq.py
